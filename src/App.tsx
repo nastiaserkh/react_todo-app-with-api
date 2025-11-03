@@ -35,7 +35,7 @@ export const App: React.FC = () => {
   const [todoTitle, setTodoTitle] = useState('');
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [blockInput, setBlockInput] = useState(false);
-  const [deletingTodos, setDeletingTodos] = useState<number[]>([]);
+  const [editingTodos, setEditingTodos] = useState<number[]>([]);
   const [displayError, setDisplayError] = useState(false);
 
   const activeTodosCount = todos.filter(todo => !todo.completed).length;
@@ -104,19 +104,19 @@ export const App: React.FC = () => {
   };
 
   function deleteTodo(id: number) {
-    setDeletingTodos(prev => [...prev, id]);
+    setEditingTodos(prev => [...prev, id]);
 
     TodosService.deleteTodo(id)
       .then(() => {
         setTodos(currentTodos => currentTodos.filter(todo => todo.id !== id));
-        setDeletingTodos(prev => prev.filter(todoId => todoId !== id));
+        setEditingTodos(prev => prev.filter(todoId => todoId !== id));
       })
       .catch(() => {
         setError('Unable to delete a todo');
         setDisplayError(true);
       });
     // .finally(() =>
-    //   setDeletingTodos(prev => prev.filter(todoId => todoId !== id)),
+    //   setEditingTodos(prev => prev.filter(todoId => todoId !== id)),
     // );
   }
 
@@ -139,7 +139,7 @@ export const App: React.FC = () => {
   };
 
   const toggleTodo = (id: number) => {
-    setDeletingTodos(prev => [...prev, id]);
+    setEditingTodos(prev => [...prev, id]);
 
     const todoToUpdate = todos.find(todo => todo.id === id);
 
@@ -158,7 +158,7 @@ export const App: React.FC = () => {
         setDisplayError(true);
       })
       .finally(() => {
-        setDeletingTodos(prev => prev.filter(todoId => todoId !== id));
+        setEditingTodos(prev => prev.filter(todoId => todoId !== id));
       });
   };
 
@@ -168,7 +168,7 @@ export const App: React.FC = () => {
     const todosToUpdate = todos.filter(todo => todo.completed !== completedAll);
 
     todosToUpdate.forEach(todo => {
-      setDeletingTodos(prev => [...prev, todo.id]);
+      setEditingTodos(prev => [...prev, todo.id]);
 
       TodosService.updateTodo(todo.id, { completed: completedAll })
         .then(updated => {
@@ -185,13 +185,13 @@ export const App: React.FC = () => {
           setDisplayError(true);
         })
         .finally(() => {
-          setDeletingTodos(prev => prev.filter(id => id !== todo.id));
+          setEditingTodos(prev => prev.filter(id => id !== todo.id));
         });
     });
   };
 
   const renameTodo = (id: number, editedTitle: string) => {
-    setDeletingTodos(prev => [...prev, id]);
+    setEditingTodos(prev => [...prev, id]);
 
     TodosService.updateTodo(id, { title: editedTitle })
       .then(updated => {
@@ -206,7 +206,7 @@ export const App: React.FC = () => {
         setDisplayError(true);
       })
       .finally(() => {
-        setDeletingTodos(prev => prev.filter(todoId => todoId !== id));
+        setEditingTodos(prev => prev.filter(todoId => todoId !== id));
       });
   };
 
@@ -249,7 +249,7 @@ export const App: React.FC = () => {
             <TodoList
               todos={filteredTodos}
               onDelete={deleteTodo}
-              deletingTodos={deletingTodos}
+              editingTodos={editingTodos}
               onToggle={toggleTodo}
               onRename={renameTodo}
               hasError={displayError}
