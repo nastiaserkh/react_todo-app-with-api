@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { Todo } from './types/Todo';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, KeyboardEvent } from 'react';
 import classNames from 'classnames';
 
 type Props = {
@@ -42,11 +42,11 @@ export const TodoItem: React.FC<Props> = ({
   const field = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isEditing && !isLoading && !hasError) {
+    if (!isLoading && !hasError) {
       setIsEditing(false);
     }
 
-    if (!isEditing && hasError) {
+    if (hasError) {
       setIsEditing(true);
     }
   }, [isLoading, hasError]);
@@ -54,6 +54,21 @@ export const TodoItem: React.FC<Props> = ({
   useEffect(() => {
     field.current?.focus();
   }, [isEditing]);
+
+  const handleBlur = () => {
+    if (todo.title === editedTitle) {
+      setIsEditing(false);
+    }
+
+    handleRename();
+  };
+
+  const handleKeyUp = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      setIsEditing(false);
+      setEditedTitle(todo.title);
+    }
+  };
 
   return (
     <div
@@ -101,19 +116,8 @@ export const TodoItem: React.FC<Props> = ({
               placeholder="Empty todo will be deleted"
               value={editedTitle}
               onChange={event => setEditedTitle(event.target.value)}
-              onBlur={() => {
-                if (todo.title === editedTitle) {
-                  setIsEditing(false);
-                }
-
-                handleRename();
-              }}
-              onKeyUp={event => {
-                if (event.key === 'Escape') {
-                  setIsEditing(false);
-                  setEditedTitle(todo.title);
-                }
-              }}
+              onBlur={handleBlur}
+              onKeyUp={handleKeyUp}
             />
           </form>
 
@@ -124,7 +128,6 @@ export const TodoItem: React.FC<Props> = ({
         </>
       )}
 
-      {/* Remove button appears only on hover */}
       {!isEditing && (
         <button
           type="button"
@@ -137,8 +140,6 @@ export const TodoItem: React.FC<Props> = ({
         </button>
       )}
 
-      {/* overlay will cover the todo while it is being deleted or updated */}
-      {/* {isLoading && ( */}
       <div
         data-cy="TodoLoader"
         className={classNames('modal overlay', { 'is-active': isLoading })}
@@ -146,7 +147,6 @@ export const TodoItem: React.FC<Props> = ({
         <div className="modal-background has-background-white-ter" />
         <div className="loader" />
       </div>
-      {/* )} */}
     </div>
   );
 };
