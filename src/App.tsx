@@ -103,7 +103,7 @@ export const App: React.FC = () => {
       });
   };
 
-  function deleteTodo(id: number) {
+  function handleDeleteTodo(id: number) {
     seteditingTodos(prev => [...prev, id]);
 
     TodosService.deleteTodo(id)
@@ -117,7 +117,7 @@ export const App: React.FC = () => {
       });
   }
 
-  const clearCompleted = () => {
+  const handleClearCompleted = () => {
     const completedTodos = todos.filter(todo => todo.completed);
 
     completedTodos.forEach(todo => {
@@ -139,7 +139,7 @@ export const App: React.FC = () => {
     });
   };
 
-  const toggleTodo = (id: number) => {
+  const handleToggleTodo = (id: number) => {
     seteditingTodos(prev => [...prev, id]);
 
     const todoToUpdate = todos.find(todo => todo.id === id);
@@ -163,7 +163,7 @@ export const App: React.FC = () => {
       });
   };
 
-  const toggleAll = () => {
+  const handleToggleAll = () => {
     const completedAll = !todos.every(todo => todo.completed);
 
     const todosToUpdate = todos.filter(todo => todo.completed !== completedAll);
@@ -230,7 +230,7 @@ export const App: React.FC = () => {
                 active: todos.length > 0 && todos.every(todo => todo.completed),
               })}
               data-cy="ToggleAllButton"
-              onClick={toggleAll}
+              onClick={handleToggleAll}
             />
           )}
 
@@ -246,9 +246,9 @@ export const App: React.FC = () => {
           <>
             <TodoList
               todos={filteredTodos}
-              onDelete={deleteTodo}
+              onDelete={handleDeleteTodo}
               editingTodos={editingTodos}
-              onToggle={toggleTodo}
+              onToggle={handleToggleTodo}
               onRename={handleRenameTodo}
               hasError={shouldDisplayError}
             />
@@ -275,7 +275,7 @@ export const App: React.FC = () => {
                 type="button"
                 className="todoapp__clear-completed"
                 data-cy="ClearCompletedButton"
-                onClick={clearCompleted}
+                onClick={handleClearCompleted}
                 disabled={!hasCompletedTodos}
               >
                 Clear completed

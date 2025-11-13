@@ -17,7 +17,7 @@ export const NewTodo: React.FC<Props> = ({
 
   useEffect(() => {
     field.current?.focus();
-  });
+  }, []);
 
   return (
     <form
